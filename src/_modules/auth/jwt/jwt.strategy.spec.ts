@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import {
+  describe, it, expect, vi, beforeEach, afterEach,
+} from 'vitest';
 import { UnauthorizedException } from '@nestjs/common';
-import { JwtStrategy } from './jwt.strategy';
-
 import { Roles } from '@prisma/client';
+import { JwtStrategy } from './jwt.strategy';
 
 // Mocks
 const mockPrismaService = {
@@ -13,7 +14,7 @@ const mockPrismaService = {
 };
 
 const mockEnvService = {
-  get: vi.fn().mockReturnValue('dGVzdC1wdWJsaWMta2V5'), 
+  get: vi.fn().mockReturnValue('dGVzdC1wdWJsaWMta2V5'),
 };
 
 describe('JwtStrategy', () => {
@@ -21,6 +22,7 @@ describe('JwtStrategy', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     jwtStrategy = new JwtStrategy(mockEnvService as any, mockPrismaService as any);
   });
 
@@ -72,7 +74,7 @@ describe('JwtStrategy', () => {
       mockPrismaService.session.findUnique.mockResolvedValue(null);
 
       await expect(jwtStrategy.validate(validPayload)).rejects.toThrow(
-        new UnauthorizedException('Sessão não encontrada')
+        new UnauthorizedException('Sessão não encontrada'),
       );
     });
 
@@ -81,43 +83,43 @@ describe('JwtStrategy', () => {
       mockPrismaService.session.findUnique.mockResolvedValue(revokedSession);
 
       await expect(jwtStrategy.validate(validPayload)).rejects.toThrow(
-        new UnauthorizedException('Sessão foi revogada, faça login novamente')
+        new UnauthorizedException('Sessão foi revogada, faça login novamente'),
       );
     });
 
     it('should throw UnauthorizedException if session has expired', async () => {
-      const expiredSession = { 
-        ...validSession, 
-        expiresAt: new Date(Date.now() - 1000) 
+      const expiredSession = {
+        ...validSession,
+        expiresAt: new Date(Date.now() - 1000),
       };
       mockPrismaService.session.findUnique.mockResolvedValue(expiredSession);
 
       await expect(jwtStrategy.validate(validPayload)).rejects.toThrow(
-        new UnauthorizedException('Sessão expirou, faça login novamente')
+        new UnauthorizedException('Sessão expirou, faça login novamente'),
       );
     });
 
     it('should throw UnauthorizedException if user is disabled', async () => {
       const disabledUserSession = {
         ...validSession,
-        user: { ...validSession.user, isDisabled: true }
+        user: { ...validSession.user, isDisabled: true },
       };
       mockPrismaService.session.findUnique.mockResolvedValue(disabledUserSession);
 
       await expect(jwtStrategy.validate(validPayload)).rejects.toThrow(
-        new UnauthorizedException('Seu usuário foi desabilitado, contate o suporte')
+        new UnauthorizedException('Seu usuário foi desabilitado, contate o suporte'),
       );
     });
 
     it('should throw UnauthorizedException if session user mismatch', async () => {
-      const mismatchPayload = { 
-        ...validPayload, 
-        sub: '123e4567-e89b-12d3-a456-426614174999' 
+      const mismatchPayload = {
+        ...validPayload,
+        sub: '123e4567-e89b-12d3-a456-426614174999',
       };
       mockPrismaService.session.findUnique.mockResolvedValue(validSession);
 
       await expect(jwtStrategy.validate(mismatchPayload)).rejects.toThrow(
-        new UnauthorizedException('Sessão inválida, faça login novamente')
+        new UnauthorizedException('Sessão inválida, faça login novamente'),
       );
     });
 
@@ -150,7 +152,7 @@ describe('JwtStrategy', () => {
   describe('cache management', () => {
     it('should invalidate specific session cache', () => {
       const sessionId = '123e4567-e89b-12d3-a456-426614174001';
-      
+
       // Não deve lançar erro
       expect(() => jwtStrategy.invalidateSessionCache(sessionId)).not.toThrow();
     });

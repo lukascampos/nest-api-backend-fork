@@ -1,9 +1,9 @@
-import { PrismaService } from '@/_config/database/prisma/prisma.service';
-import { EnvService } from '@/_config/env/env.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { z } from 'zod';
+import { EnvService } from '@/_config/env/env.service';
+import { PrismaService } from '@/_config/database/prisma/prisma.service';
 
 const tokenPayloadSchema = z.object({
   sub: z.string().uuid(),
@@ -33,12 +33,14 @@ interface CachedSession {
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   private sessionCache = new Map<string, { data: CachedSession; cachedAt: number }>();
+
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   private readonly MAX_CACHE_SIZE = 1000;
 
   constructor(
-    private env: EnvService, 
-    private prisma: PrismaService
+    private env: EnvService,
+    private prisma: PrismaService,
   ) {
     const publicKey = env.get('JWT_PUBLIC_KEY');
 
@@ -115,9 +117,9 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
             roles: true,
             email: true,
             name: true,
-          }
-        }
-      }
+          },
+        },
+      },
     });
 
     if (!session) {
@@ -132,7 +134,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         user: {
           ...session.user,
           roles: session.user.roles as string[],
-        }
+        },
       });
     }
 
@@ -142,7 +144,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       user: {
         ...session.user,
         roles: session.user.roles as string[],
-      }
+      },
     };
   }
 
@@ -154,7 +156,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
     this.sessionCache.set(sessionId, {
       data: session,
-      cachedAt: Date.now()
+      cachedAt: Date.now(),
     });
   }
 
@@ -164,18 +166,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   private cleanupCache(): void {
     const now = Date.now();
-    for (const [sessionId, cached] of this.sessionCache.entries()) {
+    Array.from(this.sessionCache.entries()).forEach(([sessionId, cached]) => {
       if ((now - cached.cachedAt) > this.CACHE_TTL) {
         this.sessionCache.delete(sessionId);
       }
-    }
+    });
   }
 
   private async updateLastUsedAt(sessionId: string): Promise<void> {
     try {
       await this.prisma.session.update({
         where: { id: sessionId },
-        data: { lastUsedAt: new Date() }
+        data: { lastUsedAt: new Date() },
       });
     } catch (error) {
       console.error('Failed to update lastUsedAt:', error);

@@ -6,16 +6,8 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
-import { ROLES_KEY } from '../decorators/roles.decorator';
 import { Roles } from '@prisma/client';
-
-interface AuthenticatedUser {
-  userId: string;
-  sessionId: string;
-  email: string;
-  name: string;
-  roles: Roles[];
-}
+import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
@@ -32,7 +24,7 @@ export class RolesGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    const user: AuthenticatedUser | undefined = request.user;
+    const { user } = request;
 
     if (!user) {
       throw new UnauthorizedException('Autenticação necessária');
@@ -46,7 +38,7 @@ export class RolesGuard implements CanActivate {
 
     if (!hasRequiredRole) {
       throw new ForbiddenException(
-        `Acesso negado. Funções necessárias: ${requiredRoles.join(', ')}`
+        `Acesso negado. Funções necessárias ${requiredRoles.join(', ')}`,
       );
     }
 
@@ -54,6 +46,6 @@ export class RolesGuard implements CanActivate {
   }
 
   private checkRolePermission(userRoles: Roles[], requiredRoles: Roles[]): boolean {
-    return requiredRoles.some(requiredRole => userRoles.includes(requiredRole));
+    return requiredRoles.some((requiredRole) => userRoles.includes(requiredRole));
   }
 }
