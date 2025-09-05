@@ -5,7 +5,7 @@ import { AppService } from './app.service';
 import { envSchema } from './_config/env/env';
 import { EnvModule } from './_config/env/env.module';
 import { AuthModule } from './_modules/auth/auth.module';
-
+import { HttpModule } from './http/http.module';
 
 @Module({
   imports: [
@@ -13,8 +13,9 @@ import { AuthModule } from './_modules/auth/auth.module';
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
-    EnvModule,
     AuthModule,
+    HttpModule,
+    EnvModule,
   ],
   controllers: [AppController],
   providers: [AppService],
