@@ -25,7 +25,7 @@ async function bootstrap() {
 
     await app.listen(port);
     logger.log(`🚀 Application running on port ${port}`);
-    
+
   } catch (error) {
     logger.error('❌ Failed to start application:', error.message);
 
@@ -34,6 +34,10 @@ async function bootstrap() {
       logger.error('   - PostgreSQL is running');
       logger.error('   - Connection string is correct');
       logger.error('   - Database credentials are valid');
+    } else if (error.code === 'P2021') {
+      logger.error('🔴 Database table missing. Please run:');
+      logger.error('   npx prisma migrate dev');
+      logger.error('   npx prisma generate');
     }
 
     process.exit(1);
