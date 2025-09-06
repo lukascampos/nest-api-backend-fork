@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { EnvService } from './_config/env/env.service';
 import { loggerConfig } from './_config/logger/logger-config';
@@ -21,8 +21,11 @@ async function bootstrap() {
       process.exit(0);
     });
 
+    app.useGlobalPipes(new ValidationPipe());
+
     await app.listen(port);
     logger.log(`🚀 Application running on port ${port}`);
+    
   } catch (error) {
     logger.error('❌ Failed to start application:', error.message);
 
