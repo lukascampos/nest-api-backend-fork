@@ -114,6 +114,7 @@ export class CreateUserUseCase {
             expiresAt,
             ipHost,
             userAgent,
+            lastUsedAt: new Date(),
           },
         });
 

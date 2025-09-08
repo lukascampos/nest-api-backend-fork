@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, Logger, UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 import { z } from 'zod';
@@ -32,6 +32,8 @@ interface CachedSession {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+  private readonly logger = new Logger(JwtStrategy.name);
+
   private sessionCache = new Map<string, { data: CachedSession; cachedAt: number }>();
 
   private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
@@ -180,7 +182,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         data: { lastUsedAt: new Date() },
       });
     } catch (error) {
-      console.error('Failed to update lastUsedAt:', error);
+      this.logger.error('Failed to update lastUsedAt:', error);
     }
   }
 
