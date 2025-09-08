@@ -11,7 +11,6 @@ const tokenPayloadSchema = z.object({
   email: z.string().email(),
   name: z.string(),
   roles: z.array(z.enum(['USER', 'ARTISAN', 'MODERATOR', 'ADMIN'])),
-  isDisabled: z.boolean(),
 });
 
 export type TokenPayload = z.infer<typeof tokenPayloadSchema>;
@@ -91,7 +90,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     this.updateLastUsedAt(session.id).catch(() => {});
 
     return {
-      userId: session.user.id,
+      sub: session.user.id,
       sessionId: session.id,
       email: session.user.email,
       name: session.user.name,
