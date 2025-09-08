@@ -1,5 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import * as cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 import { EnvService } from './_config/env/env.service';
 import { loggerConfig } from './_config/logger/logger-config';
@@ -11,6 +12,8 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
       logger: loggerConfig,
     });
+
+    app.use(cookieParser());
 
     const envService = app.get(EnvService);
     const port = envService.get('PORT');
@@ -25,7 +28,6 @@ async function bootstrap() {
 
     await app.listen(port);
     logger.log(`🚀 Application running on port ${port}`);
-
   } catch (error) {
     logger.error('❌ Failed to start application:', error.message);
 
