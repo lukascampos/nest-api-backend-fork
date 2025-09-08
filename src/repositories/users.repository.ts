@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { User, Roles } from '@prisma/client';
+import { User, Roles, Prisma } from '@prisma/client';
 import { PrismaService } from '@/_config/database/prisma/prisma.service';
 
 export interface CreateUserData {
@@ -9,6 +9,24 @@ export interface CreateUserData {
   socialName?: string;
   phone: string;
   cpf?: string;
+}
+
+export interface SearchUsersParams {
+  id?: string;
+  email?: string;
+  cpf?: string;
+  search?: string;
+  role?: Roles;
+  isActive?: boolean;
+  page: number;
+  limit: number;
+  sortBy: 'name' | 'email' | 'createdAt';
+  sortOrder: 'asc' | 'desc';
+}
+
+export interface SearchUsersResult {
+  users: User[];
+  total: number;
 }
 
 @Injectable()
@@ -93,5 +111,65 @@ export class UsersRepository {
         profile: true,
       },
     });
+  }
+
+  async searchUsers(params: SearchUsersParams): Promise<SearchUsersResult> {
+    const {
+      id, email, cpf, search, role, isActive,
+      page, limit, sortBy, sortOrder,
+    } = params;
+
+    const where: Prisma.UserWhereInput = {};
+
+    if (id) {
+      where.id = id;
+    } else {
+      if (email) {
+        where.email = { equals: email, mode: 'insensitive' };
+      }
+
+      if (cpf) {
+        where.profile = {
+          cpf,
+        };
+      }
+
+      if (search) {
+        where.OR = [
+          { name: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search, mode: 'insensitive' } },
+          { socialName: { contains: search, mode: 'insensitive' } },
+        ];
+      }
+
+      if (role) {
+        where.roles = { has: role };
+      }
+
+      if (isActive !== undefined) {
+        where.isDisabled = !isActive;
+      }
+    }
+
+    const [users] = await Promise.all([
+      this.prisma.user.findMany({
+        where,
+        include: {
+          profile: {
+            select: {
+              cpf: true,
+              phone: true,
+            },
+          },
+        },
+        orderBy: { [sortBy]: sortOrder },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+    ]);
+
+    const total = users.length;
+
+    return { users, total };
   }
 }
