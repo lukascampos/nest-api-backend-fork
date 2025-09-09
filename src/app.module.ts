@@ -6,6 +6,7 @@ import { envSchema } from './_config/env/env';
 import { EnvModule } from './_config/env/env.module';
 import { AuthModule } from './_modules/auth/auth.module';
 import { HttpModule } from './http/http.module';
+import { AttachmentsModule } from './_modules/attachments/attachments.module';
 
 @Module({
   imports: [
@@ -13,6 +14,7 @@ import { HttpModule } from './http/http.module';
       validate: (env) => envSchema.parse(env),
       isGlobal: true,
     }),
+    AttachmentsModule,
     AuthModule,
     HttpModule,
     EnvModule,
