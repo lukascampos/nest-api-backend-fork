@@ -105,7 +105,6 @@ export class GetAllArtisanApplicationsUseCase {
           email: user?.email || 'Email não disponível',
           rawMaterial: app.rawMaterial,
           technique: app.technique,
-          finalityClassification: app.finalityClassification,
           sicab: app.sicab,
           status: app.status,
           createdAt: app.createdAt,
