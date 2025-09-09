@@ -4,7 +4,7 @@ import { Either, left, right } from '@/_utils/either';
 import { UsersRepository } from '@/repositories/users.repository';
 import { ArtisanApplicationsRepository } from '@/repositories/artisan-applications.repository';
 import { UserNotFoundError } from './errors/user-not-found.error';
-import { PendingApplicationAlreadyExistsError } from './errors/pendind-application-already-exists.error';
+import { PendingApplicationAlreadyExistsError } from './errors/pending-application-already-exists.error';
 import { UserAlreadyArtisanError } from './errors/user-already-artisan.error';
 
 export interface InitiateArtisanApplicationInput {
