@@ -10,7 +10,7 @@ import { TokenPayload } from '@/_modules/auth/jwt/jwt.strategy';
 import { InitiateArtisanApplicationUseCase } from '@/use-cases/initiate-artisan-application.use-case';
 import { InitiateArtisanApplicationDto } from '../dtos/initiate-artisan-application-dto';
 import { UserNotFoundError } from '@/use-cases/errors/user-not-found.error';
-import { PendingApplicationAlreadyExistsError } from '@/use-cases/errors/pendind-application-already-exists.error';
+import { PendingApplicationAlreadyExistsError } from '@/use-cases/errors/pending-application-already-exists.error';
 import { UserAlreadyArtisanError } from '@/use-cases/errors/user-already-artisan.error';
 
 @Controller('artisan-applications')

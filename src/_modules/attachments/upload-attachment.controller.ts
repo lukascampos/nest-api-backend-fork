@@ -28,7 +28,7 @@ export class UploadAttachmentController {
             maxSize: 1024 * 1024 * 5, // 5mb
           }),
           new FileTypeValidator({
-            fileType: '.(png|jpg|jpeg)',
+            fileType: '.(png|jpg|jpeg|webp)',
           }),
         ],
       }),

@@ -17,12 +17,10 @@ export interface UploadResult {
 
 @Injectable()
 export class S3StorageService {
-  private client: S3Client;
-
   private readonly logger = new Logger(S3StorageService.name);
 
   constructor(
-      private readonly s3Client: S3Client,
+      private readonly client: S3Client,
       private readonly env: EnvService,
   ) {
     this.client = new S3Client({
