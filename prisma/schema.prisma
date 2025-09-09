@@ -1,0 +1,123 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../node_modules/.prisma/client"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Roles {
+  USER
+  ARTISAN
+  MODERATOR
+  ADMIN
+}
+
+model User {
+  id         String   @id @default(uuid())
+  email      String   @unique
+  password   String
+  roles      Roles[]
+  name       String
+  socialName String?  @map("social_name")
+  avatar     String?
+  isDisabled Boolean  @default(false) @map("is_disabled")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  profile                         UserProfile?
+  Session                         Session[]
+  artisanCreationRequestsSent     ArtisanApplication[] @relation("userRequesting")
+  artisanCreationRequestsReviewed ArtisanApplication[] @relation("userReviewer")
+  Attachment                      Attachment[]
+
+  @@map("users")
+}
+
+model Session {
+  id         String    @id @default(uuid())
+  userId     String    @map("fk_user_id")
+  isRevoked  Boolean   @default(false) @map("is_revoked")
+  startedAt  DateTime  @default(now()) @map("started_at")
+  expiresAt  DateTime  @map("expires_at")
+  lastUsedAt DateTime? @map("last_used_at")
+  ipHost     String    @map("ip_host")
+  userAgent  String    @map("user_agent")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRevoked])
+  @@map("sessions")
+}
+
+model UserProfile {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("fk_user_id")
+  cpf       String?  @unique
+  phone     String   @unique
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
+}
+
+enum FormStatus {
+  NOT_STARTED
+  SUBMITTED
+  POSTPONED
+}
+
+enum ApplicationType {
+  BE_ARTISAN
+  DISABLE_PROFILE
+}
+
+enum RequestStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ArtisanApplication {
+  id                     String          @id @default(uuid())
+  userId                 String          @map("fk_user_id")
+  formStatus             FormStatus      @default(NOT_STARTED) @map("form_status")
+  type                   ApplicationType @default(BE_ARTISAN) @map("type")
+  rawMaterial            String[]        @map("raw_material")
+  technique              String[]
+  finalityClassification String[]        @map("finality_classification")
+  bio                    String?
+  sicab                  String?
+  sicabRegistrationDate  DateTime?       @map("sicab_registration_date")
+  sicabValidUntil        DateTime?       @map("sicab_valid_until")
+  status                 RequestStatus   @default(PENDING)
+  createdAt              DateTime        @default(now()) @map("created_at")
+  updatedAt              DateTime        @default(now()) @map("updated_at")
+  reviewerId             String?         @map("fk_user_reviewer_id")
+  rejectionReason        String?
+
+  userRequesting User         @relation(fields: [userId], references: [id], name: "userRequesting")
+  userReviwer    User?        @relation(fields: [reviewerId], references: [id], name: "userReviewer")
+  Attachment     Attachment[]
+
+  @@index([userId, status])
+  @@map("artisan_applications")
+}
+
+model Attachment {
+  id                   String   @id @default(uuid())
+  userId               String?  @map("fk_user_id")
+  artisanApplicationId String?  @map("fk_artisan_application_id")
+  fileType             String   @map("file_type")
+  fileSize             BigInt   @map("file_size")
+  createdAt            DateTime @default(now()) @map("created_at")
+
+  user               User?               @relation(fields: [userId], references: [id])
+  artisanApplication ArtisanApplication? @relation(fields: [artisanApplicationId], references: [id])
+
+  @@index([userId, artisanApplicationId])
+  @@map("attachments")
+}
