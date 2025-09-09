@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   ArtisanApplication, FormStatus, ApplicationType, RequestStatus,
+  Prisma,
 } from '@prisma/client';
 import { PrismaService } from '@/_config/database/prisma/prisma.service';
 
@@ -27,6 +28,24 @@ export interface UpdateArtisanApplicationData {
   sicabRegistrationDate?: Date;
   sicabValidUntil?: Date;
   updatedAt?: Date;
+}
+
+export interface FindAllApplicationsFilters {
+  type?: ApplicationType;
+  status?: RequestStatus;
+  formStatus?: FormStatus;
+  page?: number;
+  limit?: number;
+  search?: string;
+}
+
+export interface FindAllApplicationsResult {
+  applications: (ArtisanApplication & {
+    _count: {
+      Attachment: number;
+    };
+  })[];
+  total: number;
 }
 
 @Injectable()
@@ -127,5 +146,72 @@ export class ArtisanApplicationsRepository {
       },
       orderBy: { createdAt: 'asc' },
     });
+  }
+
+  async findAllWithFilters(
+    filters: FindAllApplicationsFilters,
+  ): Promise<FindAllApplicationsResult> {
+    const {
+      type,
+      status,
+      formStatus,
+      page = 1,
+      limit = 20,
+      search,
+    } = filters;
+
+    const where: Prisma.ArtisanApplicationWhereInput = {
+      ...(type && { type }),
+      ...(status && { status }),
+      ...(formStatus && { formStatus }),
+      ...(search && {
+        OR: [
+          {
+            userRequesting: {
+              name: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            userRequesting: {
+              email: {
+                contains: search,
+                mode: 'insensitive',
+              },
+            },
+          },
+          {
+            sicab: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        ],
+      }),
+    };
+
+    const [applications, total] = await Promise.all([
+      this.prisma.artisanApplication.findMany({
+        where,
+        include: {
+          _count: {
+            select: {
+              Attachment: true,
+            },
+          },
+        },
+        orderBy: [
+          { status: 'asc' },
+          { createdAt: 'desc' },
+        ],
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      this.prisma.artisanApplication.count({ where }),
+    ]);
+
+    return { applications, total };
   }
 }

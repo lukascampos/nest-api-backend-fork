@@ -151,7 +151,7 @@ export class UsersRepository {
       }
     }
 
-    const [users] = await Promise.all([
+    const [users, total] = await Promise.all([
       this.prisma.user.findMany({
         where,
         include: {
@@ -166,10 +166,28 @@ export class UsersRepository {
         skip: (page - 1) * limit,
         take: limit,
       }),
+      this.prisma.user.count({ where }),
     ]);
 
-    const total = users.length;
-
     return { users, total };
+  }
+
+  async findManyByIds(userIds: string[]): Promise<Pick<User, 'id' | 'name' | 'email'>[]> {
+    if (userIds.length === 0) {
+      return [];
+    }
+
+    return this.prisma.user.findMany({
+      where: {
+        id: {
+          in: userIds,
+        },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+    });
   }
 }

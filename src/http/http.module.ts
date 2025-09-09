@@ -6,6 +6,7 @@ import { SearchUsersController } from './controllers/search-users.controller';
 import { InitiateArtisanApplicationController } from './controllers/initiate-artisan-application.controller';
 import { CompleteArtisanApplicationController } from './controllers/complete-artisan-application.controller';
 import { GetArtisanApplicationDetailsController } from './controllers/get-artisan-application-details.controller';
+import { GetAllArtisanApplicationsController } from './controllers/get-all-artisan-applications.controller';
 
 @Module({
   imports: [UseCasesModule],
@@ -13,6 +14,7 @@ import { GetArtisanApplicationDetailsController } from './controllers/get-artisa
     AuthenticateController,
     CompleteArtisanApplicationController,
     CreateUserController,
+    GetAllArtisanApplicationsController,
     GetArtisanApplicationDetailsController,
     InitiateArtisanApplicationController,
     SearchUsersController,
