@@ -10,5 +10,6 @@ import { S3StorageService } from './s3-storage.service';
   imports: [EnvModule, RepositoriesModule],
   providers: [UploadAttachmentUseCase, S3StorageService, S3Client],
   controllers: [UploadAttachmentController],
+  exports: [S3StorageService],
 })
 export class AttachmentsModule {}
