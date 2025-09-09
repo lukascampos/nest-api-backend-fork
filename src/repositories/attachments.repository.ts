@@ -60,7 +60,6 @@ export class AttachmentsRepository {
     });
   }
 
-  // ✅ Novo método para vincular attachments à aplicação
   async linkToArtisanApplication(
     attachmentIds: string[],
     artisanApplicationId: string,
@@ -77,7 +76,6 @@ export class AttachmentsRepository {
     });
   }
 
-  // ✅ Método para desvincular attachments (útil para cancelamentos)
   async unlinkFromArtisanApplication(attachmentIds: string[]): Promise<void> {
     await this.prisma.attachment.updateMany({
       where: {
@@ -91,7 +89,6 @@ export class AttachmentsRepository {
     });
   }
 
-  // ✅ Buscar attachments órfãos (sem aplicação, para limpeza)
   async findOrphanAttachmentsByUser(userId: string): Promise<Attachment[]> {
     return this.prisma.attachment.findMany({
       where: {
