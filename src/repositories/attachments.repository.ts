@@ -39,6 +39,7 @@ export class AttachmentsRepository {
           select: {
             id: true,
             status: true,
+            formStatus: true,
           },
         },
       },
@@ -59,9 +60,63 @@ export class AttachmentsRepository {
     });
   }
 
+  // ✅ Novo método para vincular attachments à aplicação
+  async linkToArtisanApplication(
+    attachmentIds: string[],
+    artisanApplicationId: string,
+  ): Promise<void> {
+    await this.prisma.attachment.updateMany({
+      where: {
+        id: {
+          in: attachmentIds,
+        },
+      },
+      data: {
+        artisanApplicationId,
+      },
+    });
+  }
+
+  // ✅ Método para desvincular attachments (útil para cancelamentos)
+  async unlinkFromArtisanApplication(attachmentIds: string[]): Promise<void> {
+    await this.prisma.attachment.updateMany({
+      where: {
+        id: {
+          in: attachmentIds,
+        },
+      },
+      data: {
+        artisanApplicationId: null,
+      },
+    });
+  }
+
+  // ✅ Buscar attachments órfãos (sem aplicação, para limpeza)
+  async findOrphanAttachmentsByUser(userId: string): Promise<Attachment[]> {
+    return this.prisma.attachment.findMany({
+      where: {
+        userId,
+        artisanApplicationId: null,
+        createdAt: {
+          lt: new Date(Date.now() - 24 * 60 * 60 * 1000), // Mais de 24h
+        },
+      },
+    });
+  }
+
   async delete(id: string): Promise<void> {
     await this.prisma.attachment.delete({
       where: { id },
+    });
+  }
+
+  async deleteMany(ids: string[]): Promise<void> {
+    await this.prisma.attachment.deleteMany({
+      where: {
+        id: {
+          in: ids,
+        },
+      },
     });
   }
 }
