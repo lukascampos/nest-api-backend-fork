@@ -7,7 +7,7 @@ import { InitiateArtisanApplicationUseCase } from './initiate-artisan-applicatio
 import { CompleteArtisanApplicationUseCase } from './complete-artisan-application.use-case';
 import { GetArtisanApplicationDetailsUseCase } from './get-artisan-application-details.use-case';
 import { AttachmentsModule } from '@/_modules/attachments/attachments.module';
-import { GetAllArtisanApplicationsUseCase } from './get-all-artisan-applications';
+import { GetAllArtisanApplicationsUseCase } from './get-all-artisan-applications.use-case';
 import { ModerateArtisanApplicationUseCase } from './moderate-artisan-application.use-case';
 
 @Module({

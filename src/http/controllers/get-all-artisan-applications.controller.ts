@@ -6,7 +6,7 @@ import { JwtAuthGuard } from '@/_modules/auth/jwt/jwt-auth.guard';
 import { RolesGuard } from '@/_modules/auth/roles/roles.guard';
 import { GetAllArtisanApplicationsQueryDto } from '../dtos/get-all-artisan-applications.dto';
 import { Roles } from '@/_modules/auth/decorators/roles.decorator';
-import { GetAllArtisanApplicationsUseCase } from '@/use-cases/get-all-artisan-applications';
+import { GetAllArtisanApplicationsUseCase } from '@/use-cases/get-all-artisan-applications.use-case';
 
 @Controller('artisan-applications')
 @UseGuards(JwtAuthGuard, RolesGuard)
