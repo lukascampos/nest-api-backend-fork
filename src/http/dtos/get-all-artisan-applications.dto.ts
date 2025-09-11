@@ -1,7 +1,8 @@
 import { ApplicationType, RequestStatus, FormStatus } from '@prisma/client';
-import { Transform } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
-  IsOptional, IsEnum, IsInt, Min, IsString,
+  IsOptional, IsEnum, Min, IsString,
+  IsInt,
 } from 'class-validator';
 
 export class GetAllArtisanApplicationsQueryDto {
@@ -18,14 +19,22 @@ export class GetAllArtisanApplicationsQueryDto {
     formStatus?: FormStatus;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
+  @Type(() => Number)
+  @Transform(({ value }) => {
+    const num = Number(value);
+    return Number.isNaN(num) ? 20 : num;
+  })
   @Min(1)
     page?: number;
 
   @IsOptional()
-  @Transform(({ value }) => parseInt(value, 10))
   @IsInt()
+  @Type(() => Number)
+  @Transform(({ value }) => {
+    const num = Number(value);
+    return Number.isNaN(num) ? 20 : num;
+  })
   @Min(1)
     limit?: number;
 

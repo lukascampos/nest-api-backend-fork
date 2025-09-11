@@ -19,15 +19,18 @@ export class GetAllArtisanApplicationsController {
   @Roles(PrismaRoles.ADMIN, PrismaRoles.MODERATOR)
   async handle(@Query() query: GetAllArtisanApplicationsQueryDto) {
     const {
-      type, status, formStatus, page, limit, search,
+      type, status, formStatus, search,
     } = query;
+
+    const page = query.page ? Number(query.page) : 1;
+    const limit = query.limit ? Number(query.limit) : 20;
 
     const result = await this.getAllArtisanApplicationsUseCase.execute({
       type,
       status,
       formStatus,
-      page: Number(page),
-      limit: Number(limit),
+      page,
+      limit,
       search,
     });
 
