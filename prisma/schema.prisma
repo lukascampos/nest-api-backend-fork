@@ -32,6 +32,7 @@ model User {
   artisanCreationRequestsSent     ArtisanApplication[] @relation("userRequesting")
   artisanCreationRequestsReviewed ArtisanApplication[] @relation("userReviewer")
   Attachment                      Attachment[]
+  ArtisanProfile                  ArtisanProfile?
 
   @@map("users")
 }
@@ -105,6 +106,28 @@ model ArtisanApplication {
 
   @@index([userId, status])
   @@map("artisan_applications")
+}
+
+model ArtisanProfile {
+  id                     String   @id @default(uuid())
+  userId                 String   @unique @map("fk_user_id")
+  artisanUserName        String   @unique @map("artisan_user_name")
+  rawMaterial            String[] @map("raw_material")
+  technique              String[]
+  finalityClassification String[] @map("finality_classification")
+  sicab                  String
+  sicabRegistrationDate  DateTime @map("sicab_registration_date")
+  sicabValidUntil        DateTime @map("sicab_valid_until")
+  followersCount         Int      @default(0) @map("followers_count")
+  productsCount          Int      @default(0) @map("products_count")
+  bio                    String?
+  isDisabled             Boolean  @default(false) @map("is_disabled")
+  createdAt              DateTime @default(now()) @map("created_at")
+  updatedAt              DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("artisan_profiles")
 }
 
 model Attachment {
