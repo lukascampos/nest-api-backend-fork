@@ -8,6 +8,7 @@ import { CompleteArtisanApplicationUseCase } from './complete-artisan-applicatio
 import { GetArtisanApplicationDetailsUseCase } from './get-artisan-application-details.use-case';
 import { AttachmentsModule } from '@/_modules/attachments/attachments.module';
 import { GetAllArtisanApplicationsUseCase } from './get-all-artisan-applications';
+import { ModerateArtisanApplicationUseCase } from './moderate-artisan-application.use-case';
 
 @Module({
   imports: [RepositoriesModule, AttachmentsModule],
@@ -18,6 +19,7 @@ import { GetAllArtisanApplicationsUseCase } from './get-all-artisan-applications
     GetAllArtisanApplicationsUseCase,
     GetArtisanApplicationDetailsUseCase,
     InitiateArtisanApplicationUseCase,
+    ModerateArtisanApplicationUseCase,
     SearchUsersUseCase,
   ],
   exports: [
@@ -27,6 +29,7 @@ import { GetAllArtisanApplicationsUseCase } from './get-all-artisan-applications
     GetAllArtisanApplicationsUseCase,
     GetArtisanApplicationDetailsUseCase,
     InitiateArtisanApplicationUseCase,
+    ModerateArtisanApplicationUseCase,
     SearchUsersUseCase,
   ],
 })

@@ -30,6 +30,12 @@ export interface UpdateArtisanApplicationData {
   updatedAt?: Date;
 }
 
+export interface ModerateApplicationData {
+  status: RequestStatus;
+  reviewerId: string;
+  rejectionReason?: string;
+}
+
 export interface FindAllApplicationsFilters {
   type?: ApplicationType;
   status?: RequestStatus;
@@ -116,6 +122,28 @@ export class ArtisanApplicationsRepository {
     return this.prisma.artisanApplication.update({
       where: { id },
       data,
+      include: {
+        userRequesting: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+    });
+  }
+
+  async moderateApplication(
+    id: string,
+    data: ModerateApplicationData,
+  ): Promise<ArtisanApplication> {
+    return this.prisma.artisanApplication.update({
+      where: { id },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
       include: {
         userRequesting: {
           select: {

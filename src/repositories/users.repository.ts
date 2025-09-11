@@ -190,4 +190,11 @@ export class UsersRepository {
       },
     });
   }
+
+  async updateRoles(id: string, roles: Roles[]): Promise<User> {
+    return this.prisma.user.update({
+      where: { id },
+      data: { roles },
+    });
+  }
 }
