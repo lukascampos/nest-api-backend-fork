@@ -139,16 +139,17 @@ export class ModerateArtisanApplicationUseCase {
 
   private async generateUniqueUserName(baseName: string): Promise<string> {
     const slugBase = slugify(baseName, { lower: true });
+
+    const existingUserNames = await this
+      .artisanProfilesRepository
+      .findUserNamesStartingWith(slugBase);
+
     let candidate = slugBase;
     let counter = 1;
 
-    let existingProfile = await this.artisanProfilesRepository.findByUserName(candidate);
-
-    while (existingProfile) {
+    while (existingUserNames.includes(candidate)) {
       candidate = `${slugBase}-${counter}`;
       counter += 1;
-      // eslint-disable-next-line no-await-in-loop
-      existingProfile = await this.artisanProfilesRepository.findByUserName(candidate);
     }
 
     return candidate;

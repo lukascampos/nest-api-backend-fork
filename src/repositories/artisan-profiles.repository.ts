@@ -56,6 +56,21 @@ export class ArtisanProfilesRepository {
     });
   }
 
+  async findUserNamesStartingWith(prefix: string): Promise<string[]> {
+    const profiles = await this.prisma.artisanProfile.findMany({
+      where: {
+        artisanUserName: {
+          startsWith: prefix,
+        },
+      },
+      select: {
+        artisanUserName: true,
+      },
+    });
+
+    return profiles.map((profile) => profile.artisanUserName);
+  }
+
   async update(id: string, data: UpdateArtisanProfileData): Promise<ArtisanProfile> {
     return this.prisma.artisanProfile.update({
       where: { id },
